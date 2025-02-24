@@ -1,5 +1,4 @@
 import streamlit as st
-from streamlit_option_menu import option_menu
 import pandas as pd
 import numpy as np
 import time
@@ -136,6 +135,46 @@ st.markdown("""
         border-top: 1px solid #e0e0e0 !important;
         color: #757575 !important;
     }
+    
+    .nav-link {
+        color: #424242 !important;
+        text-decoration: none !important;
+        padding: 0.5rem 1rem !important;
+        border-radius: 5px !important;
+        font-weight: 500 !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .nav-link:hover {
+        background-color: #E3F2FD !important;
+    }
+    
+    .nav-link.active {
+        background-color: #1E88E5 !important;
+        color: white !important;
+    }
+    
+    .nav-container {
+        display: flex !important;
+        justify-content: center !important;
+        gap: 10px !important;
+        padding: 10px !important;
+        background-color: #f8f9fa !important;
+        border-radius: 10px !important;
+        margin-bottom: 20px !important;
+    }
+    
+    @media (max-width: 768px) {
+        .nav-container {
+            flex-direction: column !important;
+            align-items: center !important;
+        }
+        
+        .nav-link {
+            width: 100% !important;
+            text-align: center !important;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -179,29 +218,29 @@ def generate_agent_response(query):
             return responses[key]
     return responses["default"]
 
-# Function for navigation
+# Custom navigation using Streamlit's native components
 def create_navigation():
-    selected = option_menu(
-        menu_title=None,
-        options=["Home", "Features", "Demo", "Use Cases", "Pricing", "Contact"],
-        icons=["house", "list-check", "play-circle", "briefcase", "tags", "envelope"],
-        menu_icon="cast",
-        default_index=0,
-        orientation="horizontal",
-        styles={
-            "container": {"padding": "0!important", "background-color": "#f8f9fa"},
-            "icon": {"color": "#1E88E5", "font-size": "16px"},
-            "nav-link": {
-                "font-size": "16px",
-                "text-align": "center",
-                "margin": "0px",
-                "padding": "10px 15px",
-                "--hover-color": "#eee",
-            },
-            "nav-link-selected": {"background-color": "#1E88E5", "color": "white"},
-        }
-    )
-    return selected
+    nav_options = ["Home", "Features", "Demo", "Use Cases", "Pricing", "Contact"]
+    nav_icons = ["🏠", "✅", "▶️", "💼", "💲", "✉️"]
+    
+    # Get the current page from session state or default to Home
+    if 'current_page' not in st.session_state:
+        st.session_state.current_page = "Home"
+    
+    # Create a horizontal container for navigation
+    st.markdown('<div class="nav-container">', unsafe_allow_html=True)
+    
+    cols = st.columns(len(nav_options))
+    
+    for i, (col, option, icon) in enumerate(zip(cols, nav_options, nav_icons)):
+        with col:
+            if st.button(f"{icon} {option}", key=f"nav_{option}"):
+                st.session_state.current_page = option
+                st.experimental_rerun()
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    return st.session_state.current_page
 
 # Sections
 def home_section():
